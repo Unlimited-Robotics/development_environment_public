@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'status_echo = template_raya_package.status_echo:main',
+            'status_monitor = template_raya_package.status_monitor:main',
         ],
     },
 )

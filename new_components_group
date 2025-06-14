@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+
+import sys
+from robotdevenv.components_tools import create_components_group_form_template
+from robotdevenv.components_tools import rename_component
+from robotdevenv.components_tools import rename_package_rclpy
+def main():
+    # Check if exactly one argument is provided
+    if len(sys.argv) != 2:
+        print("Error: You must provide exactly one argument with the new component name")
+        print("Usage: python3 new_components_group <component_name>")
+        sys.exit(1)
+
+    # Get the new component name
+    new_group_name = sys.argv[1]
+
+    create_components_group_form_template(new_group_name)
+    print(f"Component {new_group_name} successfully created in src/{new_group_name}")
+
+    rename_component(new_group_name, "template_component", "raya_status_monitor")
+    print(f"Component 'raya_status_monitor' successfully created in group {new_group_name}")
+
+    rename_package_rclpy(new_group_name, "template_raya_package", "raya_status_monitor")
+    print(f"Package 'raya_status_monitor' successfully created in group {new_group_name}")
+
+if __name__ == "__main__":
+    main()
