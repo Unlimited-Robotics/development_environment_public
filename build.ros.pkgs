@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+import argparse
+
+from robotdevenv.component import RobotDevComponent as Component
+from robotdevenv.robot import RobotDevRobot as Robot
+from robotdevenv.sync import RobotDevSyncHandler as SyncHandler
+from robotdevenv.run import RobotDevRunHandler as RunHandler
+from robotdevenv.managed_main_execution import managed_main_execution
+
+from robotdevenv.constants import ROBOT_BASE_PATH
+
+
+class RobotDevBuildROSPkgsError(Exception): pass
+
+
+def build_ros_packages_component():
+
+    parser = argparse.ArgumentParser()
+    robot = Robot(parser=parser)
+    component = Component(parser=parser, robot=robot)
+    sync_handler = SyncHandler(component, robot)
+    run_handler = RunHandler(component, robot)
+
+    print()
+    print('🤖🤖 UR ROBOT DEVELOPMENT ENVIRONMENT 🤖🤖')
+    print('  🦾 Build ROS packages 🦿')
+    print()
+    print(f'📦📦  Component: {component.full_name}')
+    print(f'🤖🤖      Robot: {robot.name}')
+    print()
+
+    parser.add_argument('-d', '--debug', action='store_true')
+    parser.add_argument('-s', '--sync', action='store_true')
+    parser.add_argument('--packages-select', nargs='+', type=str)
+    parser.add_argument('--packages-ignore', nargs='+', type=str)
+    args = dict(parser.parse_known_args()[0]._get_kwargs())
+
+    if not component.ros_pkgs:
+        raise RobotDevBuildROSPkgsError(
+                f'Component \'{component.full_name}\' does not include ros '
+                'packages to build'
+            )
+
+    build_command = f'{ROBOT_BASE_PATH}/scripts/build.ros.pkgs '
+    if args['debug']:
+        build_command += f'--debug '
+
+    build_command += f'--packages-list {" ".join(component.ros_pkgs)} '
+    if args['packages_select'] is not None:
+        build_command += f'--packages-to-build {" ".join(args["packages_select"])} '
+
+    if args['packages_ignore'] is not None:
+        build_command += f'--packages-ignore {" ".join(args["packages_ignore"])} '
+
+    if not robot.is_local:
+        sync_handler.sync_to_robot()
+
+    run_handler.run_command(build_command, interactive=True)
+
+
+if __name__ == "__main__":
+    managed_main_execution(build_ros_packages_component)
+

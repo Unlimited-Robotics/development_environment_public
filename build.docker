@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+import subprocess
+import argparse
+import json
+
+from robotdevenv.component import RobotDevComponent as Component
+from robotdevenv.robot import RobotDevRobot as Robot
+from robotdevenv.docker import RobotDevDockerHandler as DockerHandler
+from robotdevenv.docker import BuildImageType
+
+
+class RobotDevBuildDockerError(Exception): pass
+
+
+def build_component():
+
+    parser = argparse.ArgumentParser()
+    robot = Robot(parser=parser)
+    component = Component(parser=parser, robot=robot)
+    docker_handler = DockerHandler(component, robot)
+
+    print()
+    print('🤖🤖 UR ROBOT DEVELOPMENT ENVIRONMENT 🤖🤖')
+    print('  🦾 Build docker images 🦿')
+    print()
+    print(f'📦📦  Component: {component.full_name}')
+    print(f'🤖🤖      Robot: {robot.name}')
+    print()
+
+    parser.add_argument('-p', '--prod', action='store_true')
+    parser.add_argument('-d', '--debug', action='store_true')
+    parser.add_argument('-v', '--verbose', action='store_true')
+    args = dict(parser.parse_known_args()[0]._get_kwargs())
+
+    build_type = BuildImageType.PROD if args['prod'] else BuildImageType.DEVEL
+    debug_enable = args['debug']
+    verbose = args['verbose']
+
+    metadata = {
+                'REPO_NAME': component.repo_name,
+                'COMPONENT_NAME': component.name,
+                'REPO_METADATA': json.dumps(component.repo_manifest),
+                'COMPONENT_METADATA': json.dumps(component.component_desc),
+                'DEBUG_ENABLE': debug_enable,
+            }
+
+    docker_handler.build_image(
+        build_type=build_type, metadata=metadata, verbose=verbose,
+    )
+
+
+if __name__ == "__main__":
+    build_component()

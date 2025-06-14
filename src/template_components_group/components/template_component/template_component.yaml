@@ -1,0 +1,5 @@
+src:
+  - template_components_group
+
+ros_pkgs:
+  - template_raya_package

@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+import argparse
+
+from robotdevenv.component import RobotDevComponent as Component
+from robotdevenv.robot import RobotDevRobot as Robot
+from robotdevenv.sync import RobotDevSyncHandler as SyncHandler
+from robotdevenv.run import RobotDevRunHandler as RunHandler
+from robotdevenv.docker import BuildImageType
+from robotdevenv.managed_main_execution import managed_main_execution
+
+
+class RobotDevRunError(Exception): pass
+
+
+def run_command():
+
+    parser = argparse.ArgumentParser()
+    robot = Robot(parser=parser)
+    component = Component(parser=parser, robot=robot)
+    sync_handler = SyncHandler(component, robot)
+    run_handler = RunHandler(component, robot)
+
+    print()
+    print('🤖🤖 UR ROBOT DEVELOPMENT ENVIRONMENT 🤖🤖')
+    print(f'  🦾 Run command 🦿')
+    print()
+    print(f'📦📦  Component: {component.full_name}')
+    print(f'🤖🤖      Robot: {robot.name}')
+    print()
+
+    parser.add_argument('-d', '--detach', action='store_true')
+    parser.add_argument('-s', '--sync', action='store_true')
+    parser.add_argument('-p', '--prod', action='store_true')
+    parser.add_argument('--config', type=str)
+    args = dict(parser.parse_known_args()[0]._get_kwargs())
+
+    command_args = parser.parse_known_args()[1]
+    if command_args:
+        command = ' '.join(command_args)
+    else:
+        command = ''
+
+    if command:
+        print(f'🦿  Command to run: \'{command}\'')
+        print()
+
+    if args['sync'] and not robot.is_local:
+        sync_handler.sync_to_robot()
+
+    build_type = BuildImageType.PROD if args['prod'] else BuildImageType.DEVEL
+
+    run_handler.run_command(
+        command=command, 
+        interactive=True,
+        config_origin=args['config'],
+        build_type=build_type,
+    )
+
+
+if __name__ == "__main__":
+    managed_main_execution(run_command)

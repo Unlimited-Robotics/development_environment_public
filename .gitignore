@@ -1,0 +1,11 @@
+.idea
+.vscode
+__pycache__/
+robots.yaml
+venv/
+
+/build
+/build/**
+/src/**
+!/src/template_components_group/
+!/src/template_components_group/**

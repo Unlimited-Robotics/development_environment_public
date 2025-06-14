@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+import argparse
+
+from robotdevenv.component import RobotDevComponent as Component
+from robotdevenv.robot import RobotDevRobot as Robot
+from robotdevenv.sync import RobotDevSyncHandler as SyncHandler
+
+
+class RobotDevSyncError(Exception): pass
+
+
+def sync_component():
+    
+    parser = argparse.ArgumentParser()
+    robot = Robot(parser=parser)
+    component = Component(parser=parser, robot=robot)
+    sync_handler = SyncHandler(component, robot)
+    
+    print()
+    print('🤖🤖 UR ROBOT DEVELOPMENT ENVIRONMENT 🤖🤖')
+    print('  🦾 Sync Environment 🦿')
+    print()
+    print(f'📦📦  Component: {component.full_name}')
+    print(f'🤖🤖      Robot: {robot.name}')
+    print()
+
+    if robot.is_local:
+        raise RobotDevSyncError('Robot is localhost, nothing to synchronize.')
+
+    sync_handler.sync_to_robot()
+
+
+if __name__ == "__main__":
+    sync_component()
