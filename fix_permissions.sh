@@ -2,7 +2,7 @@
 
 set -e
 
-# Check if both arguments were provided
+# Check if both arguments were provided.
 if [ -z "$1" ] || [ -z "$2" ]; then
   echo "❌ Usage: ./fix_permissions.sh <user_folder> <robot_alias>"
   echo "   Example: ./fix_permissions.sh roy GARY011_LOCAL"
