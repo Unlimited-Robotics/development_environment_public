@@ -2,7 +2,7 @@
 
 set -e
 
-# Check if both arguments were provided.
+# Check if both arguments were provided
 if [ -z "$1" ] || [ -z "$2" ]; then
   echo "❌ Usage: ./fix_permissions.sh <user_folder> <robot_alias>"
   echo "   Example: ./fix_permissions.sh roy GARY011_LOCAL"
@@ -11,7 +11,7 @@ fi
 
 USER_FOLDER="$1"
 ROBOT_ALIAS="$2"
-SSH_CMD="ssh $ROBOT_ALIAS"
+SSH_CMD="ssh -t $ROBOT_ALIAS"
 
 echo "🔧 Connecting to $ROBOT_ALIAS to fix permissions for $USER_FOLDER..."
 
