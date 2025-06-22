@@ -16,7 +16,7 @@ echo "🔧 Connecting to $ROBOT_ALIAS to fix permissions..."
 ssh -t "$ROBOT_ALIAS" "
   cd ~/dev_workspaces &&
   USER_FOLDER=\"devel\" &&
-  echo '📁 Using user folder: \$USER_FOLDER' &&
+  echo \"📁 Using user folder: \$USER_FOLDER\" &&
   sudo chown -R gary:gary \"\$USER_FOLDER\" &&
-  echo '✅ Permissions fixed for \$USER_FOLDER'
+  echo \"✅ Permissions fixed for \$USER_FOLDER\"
 "
