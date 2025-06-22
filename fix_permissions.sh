@@ -2,21 +2,23 @@
 
 set -e
 
-# Check if both arguments were provided
-if [ -z "$1" ] || [ -z "$2" ]; then
-  echo "❌ Usage: ./fix_permissions.sh <user_folder> <robot_alias>"
-  echo "   Example: ./fix_permissions.sh roy GARY011_LOCAL"
+# Check if robot alias was provided
+if [ -z "$1" ]; then
+  echo "❌ Usage: ./fix_permissions.sh <robot_alias> [user_folder]"
+  echo "   Example: ./fix_permissions.sh GARY013_VPN roy"
+  echo "   Example: ./fix_permissions.sh GARY013_VPN            # uses default 'devel'"
   exit 1
 fi
 
-USER_FOLDER="$1"
-ROBOT_ALIAS="$2"
+ROBOT_ALIAS="$1"
+USER_FOLDER="$2"  # optional
 
-echo "🔧 Connecting to $ROBOT_ALIAS to fix permissions for $USER_FOLDER..."
+echo "🔧 Connecting to $ROBOT_ALIAS to fix permissions..."
 
 ssh -t "$ROBOT_ALIAS" "
   cd ~/dev_workspaces &&
-  echo '📁 Using user folder: $USER_FOLDER' &&
-  sudo chown -R gary:gary \"$USER_FOLDER\" &&
-  echo '✅ Permissions fixed for $USER_FOLDER'
+  USER_FOLDER=\"${USER_FOLDER:-devel}\" &&
+  echo '📁 Using user folder: \$USER_FOLDER' &&
+  sudo chown -R gary:gary \"\$USER_FOLDER\" &&
+  echo '✅ Permissions fixed for \$USER_FOLDER'
 "
